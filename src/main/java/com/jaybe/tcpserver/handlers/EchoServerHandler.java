@@ -4,14 +4,16 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
-import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class EchoServerHandler extends ChannelInboundHandlerAdapter {
 
-    private final ChannelGroup group = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+    private final ChannelGroup group;
+
+    public EchoServerHandler(ChannelGroup group) {
+        this.group = group;
+    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -29,7 +31,7 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
         // Here we want to broadcast messages to all group Clients in Channel
         // The message sent to oneself is different from the message sent to everyone
         group.forEach(ch -> {
-            ch.writeAndFlush(channel.remoteAddress() + ": " + msg + "\r\n");
+            ch.writeAndFlush(channel.remoteAddress() + ": " + msg);
         });
     }
 
